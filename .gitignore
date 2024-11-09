@@ -2,8 +2,9 @@
 Backend/node_modules
 
 # Environment variables
-Backend/.env
-
+.env
+.env.local
+Backend/firebase.js
 # Logs
 *.log
 logs/
