@@ -1,0 +1,23 @@
+
+/* src/styles/profile.css */
+.profile-container {
+    text-align: center;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    width: 80%;
+    margin: 0 auto;
+  }
+  
+  h2 {
+    color: #333;
+    font-size: 2rem;
+  }
+  
+  p {
+    color: #666;
+    font-size: 1.2rem;
+  }
+  
+  /* Add additional styling for tasks or profile management */
+  
