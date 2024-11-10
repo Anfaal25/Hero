@@ -33,7 +33,7 @@ function App() {
   // Function to fetch users from the Express server
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/users'); // Replace with the Express server URL
+      const response = await fetch('http://10.13.74.200:5000/users'); // Replace with the Express server URL
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
