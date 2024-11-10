@@ -1,5 +1,6 @@
 // App.js
 import React, { useState } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Header from "./components/Header";
 import LandingPage from "./components/LandingPage";
 import TaskBoard from "./components/TaskBoard";
@@ -7,9 +8,11 @@ import LoginModal from "./components/LoginModal";
 import RegisterModal from "./components/RegisterModal";
 import ProfileModal from "./components/ProfileModal";
 import CreateTaskModal from "./components/CreateTaskModal";
+import { auth, db } from './firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 function App() {
-  const [isLandingPage, setIsLandingPage] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
@@ -38,100 +41,51 @@ function App() {
   ]);
   const [inProgressTasks, setInProgressTasks] = useState([]);
 
-  const mockUser = {
-    name: "John Doe",
-    email: "john@example.com",
-    completedTasks: [
-      {
-        id: 1,
-        title: "Website Redesign",
-        description:
-          "Create new homepage layout and implement responsive design",
-        completedDate: "2023-11-15",
-        status: "Completed",
-        priority: "High",
-        pointsEarned: 50,
-      },
-      {
-        id: 2,
-        title: "API Integration",
-        description: "Connect payment gateway API and implement error handling",
-        completedDate: "2023-11-10",
-        status: "Completed",
-        priority: "Medium",
-        pointsEarned: 30,
-      },
-    ],
-    get auraPoints() {
-      return this.completedTasks.reduce(
-        (total, task) => total + task.pointsEarned,
-        0
-      );
-    },
-  };
+  const navigate = useNavigate();
 
-  const calculatePoints = (priority) => {
-    const pointsMap = {
-      High: 50,
-      Medium: 30,
-      Low: 10,
-    };
-    return pointsMap[priority];
-  };
-
-  const deleteTask = (taskId) => setTasks(tasks.filter((task) => task.id !== taskId));
   const toggleLoginModal = () => setIsLoginModalOpen(!isLoginModalOpen);
   const toggleRegisterModal = () => setIsRegisterModalOpen(!isRegisterModalOpen);
   const toggleProfileModal = () => setIsProfileModalOpen(!isProfileModalOpen);
   const toggleCreateTaskModal = () => setIsCreateTaskModalOpen(!isCreateTaskModalOpen);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setIsLoggedIn(true);
-    setIsLoginModalOpen(false);
-    setIsLandingPage(false);
+  // Handle Login with Firebase Authentication
+  const handleLogin = (email, password) => {
+    return signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        setIsLoggedIn(true);
+        navigate("/tasks"); // Navigate to /tasks on successful login
+      });
   };
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    setIsLoggedIn(true);
-    setIsRegisterModalOpen(false);
-    setIsLandingPage(false);
+  // Handle Register with Firebase Authentication
+  const handleRegister = async (name, email, password) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userId = userCredential.user.uid;
+      await setDoc(doc(db, "users", userId), {
+        name: name,
+        email: email,
+        createdAt: new Date(),
+      });
+      console.log("User registered and data saved in Firestore");
+      setIsRegisterModalOpen(false);
+    } catch (error) {
+      console.error("Error registering user:", error);
+    }
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setIsLandingPage(true);
     setIsProfileModalOpen(false);
+    navigate("/"); // Optionally navigate back to the home page on logout
   };
 
   const acceptTask = (taskId) => {
     const task = tasks.find((t) => t.id === taskId);
     if (task) {
       setTasks(tasks.filter((t) => t.id !== taskId));
-      setInProgressTasks([
-        ...inProgressTasks,
-        {
-          ...task,
-          status: "In Progress",
-        },
-      ]);
+      setInProgressTasks([...inProgressTasks, { ...task, status: "In Progress" }]);
     }
-  };
-
-  const createTask = (newTask) => {
-    const points = calculatePoints(newTask.priority);
-    setTasks([
-      ...tasks,
-      {
-        ...newTask,
-        id: tasks.length + 1,
-        status: "Available",
-        points,
-        createdByUser: true,
-      },
-    ]);
-    setIsCreateTaskModalOpen(false);
   };
 
   const inputStyles =
@@ -148,17 +102,27 @@ function App() {
         handleLogout={handleLogout}
       />
 
-      {isLandingPage ? (
-        <LandingPage />
-      ) : (
-        <TaskBoard
-          tasks={tasks}
-          inProgressTasks={inProgressTasks}
-          acceptTask={acceptTask}
-          deleteTask={deleteTask}
+      {/* Define Routes */}
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/tasks"
+          element={
+            isLoggedIn ? (
+              <TaskBoard
+                tasks={tasks}
+                inProgressTasks={inProgressTasks}
+                acceptTask={acceptTask}
+              />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
-      )}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
 
+      {/* Modals */}
       <LoginModal
         isOpen={isLoginModalOpen}
         toggleModal={toggleLoginModal}
@@ -174,12 +138,22 @@ function App() {
       <ProfileModal
         isOpen={isProfileModalOpen}
         toggleModal={toggleProfileModal}
-        mockUser={mockUser}
+        mockUser={{
+          name: "John Doe",
+          email: "john@example.com",
+          completedTasks: [],
+          auraPoints: 100,
+        }}
       />
       <CreateTaskModal
         isOpen={isCreateTaskModalOpen}
         toggleModal={toggleCreateTaskModal}
-        createTask={createTask}
+        createTask={(newTask) =>
+          setTasks([
+            ...tasks,
+            { ...newTask, id: tasks.length + 1, createdByUser: true },
+          ])
+        }
         inputStyles={inputStyles}
       />
     </div>

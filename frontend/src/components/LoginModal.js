@@ -1,9 +1,30 @@
 // LoginModal.js
-import React from "react";
+import React, { useState } from "react";
 import { X } from "lucide-react";
 
-function LoginModal({ isOpen, toggleModal, handleLogin, inputStyles }) {
+function LoginModal({ isOpen, toggleModal, inputStyles, handleLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      await handleLogin(email, password);
+      // Clear form and close modal
+      setEmail("");
+      setPassword("");
+      toggleModal();
+    } catch (err) {
+      setError("Invalid email or password. Please try again.");
+      console.error("Login error:", err);
+    }
+  };
+
   if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white rounded-lg p-8 max-w-md w-full">
@@ -16,18 +37,33 @@ function LoginModal({ isOpen, toggleModal, handleLogin, inputStyles }) {
             <X className="w-6 h-6" />
           </button>
         </div>
-        <form onSubmit={handleLogin} className="space-y-4">
+        {error && (
+          <p className="text-red-500 text-sm mb-4">{error}</p>
+        )}
+        <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Email
             </label>
-            <input type="email" className={inputStyles} required />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={inputStyles}
+              required
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Password
             </label>
-            <input type="password" className={inputStyles} required />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={inputStyles}
+              required
+            />
           </div>
           <button
             type="submit"
