@@ -6,7 +6,7 @@ const { db, collection, getDocs, addDoc } = require('./firebase'); // Import Fir
 const app = express();
 const port = 5000;
 
-// Enable CORS for all routes
+// Enable CORS for all routes to allow requests from other devices
 app.use(cors());
 
 // Endpoint to fetch all users from Firebase
@@ -21,13 +21,13 @@ app.get('/users', async (req, res) => {
     }
 });
 
-// Start the Express server
-app.listen(port, () => {
-    console.log(`Express server running on http://localhost:${port}`);
+// Start the Express server and listen on 0.0.0.0 for network access
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Express server running on http://0.0.0.0:${port}`);
 });
 
 // WebSocket server setup
-const wss = new WebSocket.Server({ host: '10.36.128.17', port: 8080 }); // Replace with your server's IP
+const wss = new WebSocket.Server({ host: '0.0.0.0', port: 8080 }); // Use 0.0.0.0 to bind to all network interfaces
 
 wss.on('connection', (ws) => {
     console.log('Client connected');
@@ -57,7 +57,7 @@ wss.on('connection', (ws) => {
     });
 });
 
-// Broadcast data to all clients
+// Broadcast data to all connected clients
 function broadcast(data) {
     wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
@@ -66,4 +66,4 @@ function broadcast(data) {
     });
 }
 
-console.log('WebSocket server running on ws://10.13.74.200:8080');
+console.log('WebSocket server running on ws://0.0.0.0:8080');
