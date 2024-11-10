@@ -9,7 +9,7 @@ function App() {
 
   useEffect(() => {
     // WebSocket connection setup
-    const socket = new WebSocket('ws://10.36.128.17:8080'); // Use the server's IP address and port
+    const socket = new WebSocket('ws://10.36.128.17:3000'); // Use the server's IP address and port
     setWs(socket);
 
     socket.onopen = () => {

@@ -27,7 +27,7 @@ app.listen(port, '0.0.0.0', () => {
 });
 
 // WebSocket server setup
-const wss = new WebSocket.Server({ host: '0.0.0.0', port: 8080 }); // Use 0.0.0.0 to bind to all network interfaces
+const wss = new WebSocket.Server({ host: '0.0.0.0', port: 3000 }); // Use 0.0.0.0 to bind to all network interfaces
 
 wss.on('connection', (ws) => {
     console.log('Client connected');
@@ -66,4 +66,4 @@ function broadcast(data) {
     });
 }
 
-console.log('WebSocket server running on ws://0.0.0.0:8080');
+console.log('WebSocket server running on ws://0.0.0.0:3000');
