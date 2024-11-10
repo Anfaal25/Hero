@@ -9,30 +9,36 @@ function App() {
 
   useEffect(() => {
     // Connect to the WebSocket server
-    const socket = new WebSocket('ws://10.13.74.200:8080'); // Updated to 8081
-
+    const socket = new WebSocket('ws://10.13.74.200:8080'); // Use server IP and port
     setWs(socket);
 
-    // Listen for messages from the server
+    socket.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-
       if (data.type === 'init') {
-        // Initial list of users on new connection
         setUsers(data.users);
       } else if (data.type === 'update') {
-        // Updated list of users after a new one is added
         setUsers(data.users);
       }
     };
 
-    // Cleanup on component unmount
     return () => socket.close();
   }, []);
 
   // Function to handle the "Sign Up" button click
   const handleSignUp = () => {
-    if (ws && firstName && lastName) {
+    if (ws && ws.readyState === WebSocket.OPEN) { // Check if WebSocket is open
       const newUser = {
         type: 'newUser',
         firstName,
@@ -41,6 +47,8 @@ function App() {
       ws.send(JSON.stringify(newUser));
       setFirstName('');
       setLastName('');
+    } else {
+      console.log('WebSocket is not open. Unable to send data.');
     }
   };
 
