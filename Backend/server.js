@@ -4,7 +4,7 @@ const cors = require('cors');
 const { db, collection, getDocs, addDoc } = require('./firebase'); // Import Firebase config and Firestore functions
 
 const app = express();
-const port = 5000;
+const port = 3000;
 
 // Enable CORS for all routes to allow requests from other devices
 app.use(cors());
@@ -27,7 +27,7 @@ app.listen(port, '0.0.0.0', () => {
 });
 
 // WebSocket server setup
-const wss = new WebSocket.Server({ host: '0.0.0.0', port: 3000 }); // Use 0.0.0.0 to bind to all network interfaces
+const wss = new WebSocket.Server({ host: '0.0.0.0', port: 5000 }); // Use 0.0.0.0 to bind to all network interfaces
 
 wss.on('connection', (ws) => {
     console.log('Client connected');
