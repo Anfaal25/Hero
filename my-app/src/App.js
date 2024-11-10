@@ -5,40 +5,53 @@ function App() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [users, setUsers] = useState([]);
-  const [ws, setWs] = useState(null); // Store WebSocket connection
+  const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    // Connect to the WebSocket server
-    const socket = new WebSocket('ws://10.13.74.200:8080'); // Use server IP and port
+    // WebSocket connection setup
+    const socket = new WebSocket('ws://10.13.74.200:8080'); // Replace with your server's IP address and port
     setWs(socket);
 
     socket.onopen = () => {
       console.log('WebSocket connection established');
     };
 
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'update') {
+        fetchUsers(); // Fetch updated users list on receiving update message
+      }
     };
 
     socket.onclose = () => {
       console.log('WebSocket connection closed');
     };
 
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'init') {
-        setUsers(data.users);
-      } else if (data.type === 'update') {
-        setUsers(data.users);
-      }
-    };
-
     return () => socket.close();
   }, []);
 
-  // Function to handle the "Sign Up" button click
+  // Function to fetch users from the Express server
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/users'); // Replace with the Express server URL
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      const usersData = await response.json();
+      setUsers(usersData);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  // Fetch users once on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // Handle the "Sign Up" button click
   const handleSignUp = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) { // Check if WebSocket is open
+    if (ws && ws.readyState === WebSocket.OPEN) {
       const newUser = {
         type: 'newUser',
         firstName,
@@ -54,8 +67,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Hello World</h1>
-
+      <h1>Sign Up</h1>
       <div className="form">
         <input
           type="text"
@@ -71,12 +83,11 @@ function App() {
         />
         <button onClick={handleSignUp}>Sign Up</button>
       </div>
-
       <h2>All Users</h2>
       <ul>
         {users.map((user, index) => (
           <li key={index}>
-            {user.firstName} {user.lastName}
+            {user.First_Name} {user.Last_Name}
           </li>
         ))}
       </ul>
