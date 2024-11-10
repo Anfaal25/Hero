@@ -27,7 +27,7 @@ app.listen(port, () => {
 });
 
 // WebSocket server setup
-const wss = new WebSocket.Server({ host: '10.13.74.200', port: 8080 }); // Replace with your server's IP
+const wss = new WebSocket.Server({ host: '10.36.128.17', port: 8080 }); // Replace with your server's IP
 
 wss.on('connection', (ws) => {
     console.log('Client connected');
