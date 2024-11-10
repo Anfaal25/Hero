@@ -9,7 +9,7 @@ function App() {
 
   useEffect(() => {
     // WebSocket connection setup
-    const socket = new WebSocket('ws://10.36.128.17:3000'); // Use the server's IP address and port
+    const socket = new WebSocket('ws://10.13.74.200:3000'); // Use the server's IP address and port
     setWs(socket);
 
     socket.onopen = () => {
@@ -33,8 +33,9 @@ function App() {
   // Function to fetch users from the Express server
   const fetchUsers = async () => {
     try {
-      console.log('Fetching users from http://10.36.128.17:5000/users'); // Use the server's IP address
-      const response = await fetch('http://10.36.128.17:5000/users');
+      console.log('Fetching users from http://10.13.74.200:5000/users'); // Use the server's IP address
+      const response = await fetch('http://10.13.74.200:5000/users');
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
