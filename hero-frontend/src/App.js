@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import TaskPage from "./pages/TaskPage";
 import Profile from "./pages/Profile";  // Import Profile
+import CreateTask  from "./components/CreateTask";
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/task/:id" element={<TaskPage />} />
         <Route path="/profile" element={<Profile />} />  {/* Profile Route */}
+        <Route path="/create-task" element={<CreateTask />} />
+
       </Routes>
     </div>
   );
