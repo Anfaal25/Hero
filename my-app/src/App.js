@@ -9,7 +9,7 @@ function App() {
 
   useEffect(() => {
     // WebSocket connection setup
-    const socket = new WebSocket('ws://10.36.128.17:8080'); // Replace with your server's IP address and port
+    const socket = new WebSocket('ws://10.36.128.17:8080'); // Use the server's IP address and port
     setWs(socket);
 
     socket.onopen = () => {
@@ -19,7 +19,7 @@ function App() {
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'update') {
-        fetchUsers(); // Fetch updated users list on receiving update message
+        fetchUsers(); // Fetch updated users list on receiving an update message
       }
     };
 
@@ -33,7 +33,8 @@ function App() {
   // Function to fetch users from the Express server
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://10.13.74.200:5000/users'); // Replace with the Express server URL
+      console.log('Fetching users from http://10.36.128.17:5000/users'); // Use the server's IP address
+      const response = await fetch('http://10.36.128.17:5000/users');
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
@@ -44,7 +45,6 @@ function App() {
     }
   };
 
-  // Fetch users once on component mount
   useEffect(() => {
     fetchUsers();
   }, []);
