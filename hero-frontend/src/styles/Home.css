@@ -1,0 +1,120 @@
+.home-container {
+  position: relative;
+  padding: 20px;
+  min-height: 100vh;  /* Make sure the container fills the entire height of the viewport */
+  box-sizing: border-box;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 40px;  /* Increased margin for better spacing */
+  font-size: 32px;  /* Larger title */
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;  /* Add gap between task cards */
+  max-height: calc(100vh - 180px); /* Adjust for the space taken by the header and profile button */
+  overflow-y: auto;
+  padding: 0 20px;
+}
+
+.cards-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;  /* Ensure enough space between cards */
+  width: 100%;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;  /* Limit the max width of each card */
+  margin-bottom: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background: linear-gradient(0deg, #509552, rgb(4, 88, 4));
+  color: white;
+  transition: background 0.3s ease;
+  position: relative;
+}
+
+.card:hover {
+  background: linear-gradient(90deg, #45a049, #59525200);
+}
+
+.card-actions {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.edit-action, .delete-action {
+  cursor: pointer;
+  display: block;
+  padding: 8px;
+  font-size: 24px;
+  line-height: 0;
+  position: relative;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: 60px;
+  background-color: black;
+  color: red;
+  text-align: center;
+  border-radius: 6px;
+  margin: 2px;
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  right: 10px;
+  font-size: medium;
+}
+
+.edit-action:hover .tooltip, .delete-action:hover .tooltip {
+  visibility: visible;
+}
+
+.profile-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.profile-button:hover {
+  background-color: #45a049;
+}
+
+.create-task-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ff9800;
+  color: white;
+  font-size: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+}
+
+.create-task-button:hover {
+  background-color: #e68900;
+}
