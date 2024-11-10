@@ -1,51 +1,39 @@
+// App.js
 import React, { useState } from "react";
-import { render } from "react-dom";
-import {
-  LogOutIcon,
-  PlusIcon,
-  UserIcon,
-  X,
-  Clock,
-  CheckCircle,
-  Calendar,
-  Target,
-} from "lucide-react";
-
-import LandingPage from "./LandingPage";
-import TaskBoard from "./Task";
+import Header from "./components/Header";
+import LandingPage from "./components/LandingPage";
+import TaskBoard from "./components/TaskBoard";
+import LoginModal from "./components/LoginModal";
+import RegisterModal from "./components/RegisterModal";
+import ProfileModal from "./components/ProfileModal";
+import CreateTaskModal from "./components/CreateTaskModal";
 
 function App() {
   const [isLandingPage, setIsLandingPage] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
+
   const [tasks, setTasks] = useState([
     {
       id: 1,
-      title: "Design System Update",
-      description: "Update component library with new design tokens",
-      status: "Open",
+      title: "Develop Landing Page",
+      description: "Create a responsive landing page for the new product",
+      status: "Available",
       priority: "High",
-      dueDate: "2023-12-20",
+      points: 50,
+      createdByUser: false,
     },
     {
       id: 2,
-      title: "User Authentication",
-      description: "Implement OAuth2 authentication flow",
-      status: "Open",
+      title: "API Integration",
+      description: "Integrate payment gateway API",
+      status: "Available",
       priority: "Medium",
-      dueDate: "2023-12-25",
-    },
-    {
-      id: 3,
-      title: "Database Migration",
-      description: "Migrate data to new cloud infrastructure",
-      status: "Open",
-      priority: "High",
-      dueDate: "2023-12-15",
+      points: 30,
+      createdByUser: false,
     },
   ]);
   const [inProgressTasks, setInProgressTasks] = useState([]);
@@ -61,43 +49,60 @@ function App() {
           "Create new homepage layout and implement responsive design",
         completedDate: "2023-11-15",
         status: "Completed",
+        priority: "High",
+        pointsEarned: 50,
       },
       {
         id: 2,
         title: "API Integration",
-        description:
-          "Connect payment gateway API and implement error handling",
+        description: "Connect payment gateway API and implement error handling",
         completedDate: "2023-11-10",
         status: "Completed",
+        priority: "Medium",
+        pointsEarned: 30,
       },
     ],
+    get auraPoints() {
+      return this.completedTasks.reduce(
+        (total, task) => total + task.pointsEarned,
+        0
+      );
+    },
   };
 
-  const features = [
-    {
-      icon: <Target className="w-8 h-8 text-blue-500" />,
-      title: "Task Management",
-      description: "Organize and prioritize your work efficiently",
-    },
-    {
-      icon: <Calendar className="w-8 h-8 text-blue-500" />,
-      title: "Due Dates",
-      description: "Never miss a deadline with our scheduling system",
-    },
-    {
-      icon: <CheckCircle className="w-8 h-8 text-blue-500" />,
-      title: "Progress Tracking",
-      description: "Monitor your team's progress in real-time",
-    },
-  ];
+  const calculatePoints = (priority) => {
+    const pointsMap = {
+      High: 50,
+      Medium: 30,
+      Low: 10,
+    };
+    return pointsMap[priority];
+  };
 
+  const deleteTask = (taskId) => setTasks(tasks.filter((task) => task.id !== taskId));
   const toggleLoginModal = () => setIsLoginModalOpen(!isLoginModalOpen);
-  const toggleTaskModal = () => setIsTaskModalOpen(!isTaskModalOpen);
+  const toggleRegisterModal = () => setIsRegisterModalOpen(!isRegisterModalOpen);
   const toggleProfileModal = () => setIsProfileModalOpen(!isProfileModalOpen);
-  const toggleRegisterModal = () => {
-    setIsRegisterModalOpen(!isRegisterModalOpen);
+  const toggleCreateTaskModal = () => setIsCreateTaskModalOpen(!isCreateTaskModalOpen);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setIsLoggedIn(true);
     setIsLoginModalOpen(false);
-    setFormErrors({});
+    setIsLandingPage(false);
+  };
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    setIsLoggedIn(true);
+    setIsRegisterModalOpen(false);
+    setIsLandingPage(false);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setIsLandingPage(true);
+    setIsProfileModalOpen(false);
   };
 
   const acceptTask = (taskId) => {
@@ -114,78 +119,71 @@ function App() {
     }
   };
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setIsLoggedIn(true);
-    setIsLoginModalOpen(false);
-    setIsLandingPage(false);
+  const createTask = (newTask) => {
+    const points = calculatePoints(newTask.priority);
+    setTasks([
+      ...tasks,
+      {
+        ...newTask,
+        id: tasks.length + 1,
+        status: "Available",
+        points,
+        createdByUser: true,
+      },
+    ]);
+    setIsCreateTaskModalOpen(false);
   };
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const newErrors = {};
-    if (!form.name.value) newErrors.name = "Name is required";
-    if (!form.email.value) newErrors.email = "Email is required";
-    if (!form.location.value) newErrors.location = "Location is required";
-    if (!form.password.value) newErrors.password = "Password is required";
-    if (Object.keys(newErrors).length > 0) {
-      setFormErrors(newErrors);
-      return;
-    }
-    setIsRegisterModalOpen(false);
-    setIsLoginModalOpen(true);
-    setFormErrors({});
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setIsProfileModalOpen(false);
-    setIsLandingPage(true);
-  };
-
-  const handleProfileClick = () => {
-    if (isLoggedIn) {
-      toggleProfileModal();
-    } else {
-      toggleLoginModal();
-    }
-  };
+  const inputStyles =
+    "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500";
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-100">
+      <Header
+        isLoggedIn={isLoggedIn}
+        toggleLoginModal={toggleLoginModal}
+        toggleRegisterModal={toggleRegisterModal}
+        toggleProfileModal={toggleProfileModal}
+        toggleCreateTaskModal={toggleCreateTaskModal}
+        handleLogout={handleLogout}
+      />
+
       {isLandingPage ? (
-        <LandingPage
-          setIsLoginModalOpen={setIsLoginModalOpen}
-          setIsRegisterModalOpen={setIsRegisterModalOpen}
-          isLoginModalOpen={isLoginModalOpen}
-          isRegisterModalOpen={isRegisterModalOpen}
-          toggleLoginModal={toggleLoginModal}
-          toggleRegisterModal={toggleRegisterModal}
-          formErrors={formErrors}
-          handleLogin={handleLogin}
-          handleRegister={handleRegister}
-          features={features}
-        />
+        <LandingPage />
       ) : (
         <TaskBoard
           tasks={tasks}
-          setTasks={setTasks}
           inProgressTasks={inProgressTasks}
-          setInProgressTasks={setInProgressTasks}
-          isLoggedIn={isLoggedIn}
-          isTaskModalOpen={isTaskModalOpen}
-          isProfileModalOpen={isProfileModalOpen}
-          toggleTaskModal={toggleTaskModal}
-          toggleProfileModal={toggleProfileModal}
           acceptTask={acceptTask}
-          handleLogout={handleLogout}
-          handleProfileClick={handleProfileClick}
-          mockUser={mockUser}
+          deleteTask={deleteTask}
         />
       )}
-    </>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        toggleModal={toggleLoginModal}
+        handleLogin={handleLogin}
+        inputStyles={inputStyles}
+      />
+      <RegisterModal
+        isOpen={isRegisterModalOpen}
+        toggleModal={toggleRegisterModal}
+        handleRegister={handleRegister}
+        inputStyles={inputStyles}
+      />
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        toggleModal={toggleProfileModal}
+        mockUser={mockUser}
+      />
+      <CreateTaskModal
+        isOpen={isCreateTaskModalOpen}
+        toggleModal={toggleCreateTaskModal}
+        createTask={createTask}
+        inputStyles={inputStyles}
+      />
+    </div>
   );
 }
 
-render(<App />, document.getElementById("root"));
+export default App;

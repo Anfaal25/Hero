@@ -1,11 +1,11 @@
+// index.js
 import React from "react";
-import ReactDOM from "react-dom";
-import TaskBoard from "./TaskBoard"; // Adjust path if necessary
-import "./index.css"; // Import your TailwindCSS
+import { createRoot } from "react-dom/client";
+import App from "./App";
+// index.js or App.js
+import "./index.css";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <TaskBoard />
-  </React.StrictMode>,
-  document.getElementById("root")
-);
+
+const rootElement = document.getElementById("root");
+const root = createRoot(rootElement);
+root.render(<App />);

@@ -1,7 +1,8 @@
+// LoginModal.js
 import React from "react";
 import { X } from "lucide-react";
 
-function LoginModal({ isOpen, toggleModal, handleLogin, toggleRegisterModal }) {
+function LoginModal({ isOpen, toggleModal, handleLogin, inputStyles }) {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -17,27 +18,16 @@ function LoginModal({ isOpen, toggleModal, handleLogin, toggleRegisterModal }) {
         </div>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-gray-700 mb-2" htmlFor="email">
+            <label className="block text-sm font-medium text-gray-700">
               Email
             </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
-            />
+            <input type="email" className={inputStyles} required />
           </div>
           <div>
-            <label
-              className="block text-gray-700 mb-2"
-              htmlFor="password"
-            >
+            <label className="block text-sm font-medium text-gray-700">
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
-            />
+            <input type="password" className={inputStyles} required />
           </div>
           <button
             type="submit"
@@ -46,15 +36,6 @@ function LoginModal({ isOpen, toggleModal, handleLogin, toggleRegisterModal }) {
             Login
           </button>
         </form>
-        <p className="mt-4 text-center text-gray-600">
-          Don't have an account?{" "}
-          <button
-            onClick={toggleRegisterModal}
-            className="text-blue-500 hover:text-blue-600"
-          >
-            Register
-          </button>
-        </p>
       </div>
     </div>
   );
